@@ -1,6 +1,7 @@
 import csv
 import os
 import requests
+import time
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -9,7 +10,7 @@ LIMIT = 100
 
 url = f"https://api.polygon.io/v3/reference/tickers?market=stocks&active=true&order=asc&limit={LIMIT}&sort=ticker&apiKey={API_KEY}"
 
-if __name__=="__main__": 
+def stock_job():
     response = requests.get(url)
     if response.status_code != 200:
         raise TimeoutError(f"unable to make the request, status: {response.status_code}")
@@ -41,10 +42,15 @@ if __name__=="__main__":
                       'last_updated_utc': '2025-09-24T06:06:16.196092144Z'
                       }
     fieldnames = list(example_ticker.keys())
-    csv_path = 'tickers.csv'
+    csv_path = '/home/tiasz/stock_market_api/tickers.csv'
     with open (csv_path, mode='w', newline='', encoding='utf-8') as file:
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
         for ticker in tickers:
             row = {key: ticker.get(key, '') for key in fieldnames}
             writer.writerow(row)
+
+    print(f"finished execution at {time.localtime()}")
+    
+if __name__ == "__main__":
+    stock_job()
